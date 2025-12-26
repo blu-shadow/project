@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DadaXWear - Premium Jerseys</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="container" style="gap:10px;">
+            <h1 class="logo">DadaXWear</h1>
+
+            <div style="display:flex;gap:10px;align-items:center;">
+                <a href="admin.html" title="Admin Panel" style="text-decoration: none;">
+                    <button id="admin-login-btn" class="cart-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </button>
+                </a>
+
+                <button id="cart-button" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>🔥 Our Exclusive Jerseys</h2>
+        <div class="product-grid" id="product-grid">
+            </div>
+    </main>
+
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>🛒 Your Shopping Cart</h3>
+
+            <div id="cart-items-list">
+                <p>Your cart is empty.</p>
+            </div>
+
+            <div class="cart-summary">
+                <p>Subtotal: <span id="cart-subtotal">0</span> TK</p>
+                <p class="shipping-info">
+                    Shipping Fee: <b>55 TK</b> (Chittagong) / <b>115 TK</b> (Outside Chittagong)
+                </p>
+                <p>Total (Approx): <strong id="cart-total">0</strong> TK</p>
+            </div>
+
+            <button id="checkout-button" class="btn primary-btn">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="checkout-close-btn">&times;</span>
+            <h3>📝 Checkout Information</h3>
+
+            <form id="checkout-form">
+
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Full Address (Street, City, Post Code) *</label>
+                    <textarea id="address" name="address" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment">Payment Method *</label>
+                    <select id="payment" name="payment" required>
+                        <option value="bkash">bKash (Preferred)</option>
+                        <option value="nogod">Nogod</option>
+                    </select>
+                </div>
+
+                <div id="bkash-info" class="payment-info">
+                    <p>
+                        <b>bKash Instructions:</b><br>
+                        Please send the total amount (TK
+                        <span id="final-total-display">0</span>)
+                        to our Merchant number:<br>
+                        <b>+880 1610-221486</b><br><br>
+                        <b>Note:</b> You must enter the <b>Transaction ID (TrxID)</b> below.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="trxid">bKash Transaction ID (TrxID)</label>
+                        <input type="text" id="trxid" name="trxid" placeholder="e.g., 8V5A1T4Y">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn primary-btn">
+                    Place Order
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal">
+        <div class="modal-content success-content">
+            <span class="close-button">&times;</span>
+            <h3>🎉 Order Placed Successfully!</h3>
+            <p>Thank you for your order! We have received your information.</p>
+            <p>We will contact you shortly on your provided phone number for confirmation.</p>
+            <p class="final-message">
+                Your order data has been prepared for the admin system.
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

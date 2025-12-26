@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DadaXWear Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f8;
+            color: #333;
+        }
+
+        /* ===== Login Screen ===== */
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin-bottom: 20px;
+            color: #E8491D;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #E8491D;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background: #c93b16;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* ===== Admin Panel ===== */
+        .admin-panel {
+            display: none;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 3px solid #E8491D;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #E8491D;
+            font-size: 1.5rem;
+        }
+
+        header button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .orders {
+            margin-top: 20px;
+        }
+
+        .order-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .order-card h3 {
+            margin: 0 0 10px;
+            color: #E8491D;
+        }
+
+        .order-card p {
+            margin: 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .order-items {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            padding-left: 15px;
+        }
+
+        .empty {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div class="login-container" id="loginScreen">
+    <div class="login-box">
+        <h2>🔐 Admin Login</h2>
+        <input type="password" id="passkey" placeholder="Enter Admin Pass Key">
+        <p class="error" id="loginError">❌ Wrong Pass Key</p>
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="admin-panel" id="adminPanel">
+
+    <header>
+        <h1>📦 DadaXWear Orders</h1>
+        <button onclick="logout()">Logout</button>
+    </header>
+
+    <div class="orders" id="orderList"></div>
+
+</div>
+
+<script>
+    /* ===== CONFIG ===== */
+    const ADMIN_PASSKEY = "dadawear123"; // 🔑 change later
+
+    /* ===== LOGIN ===== */
+    function login() {
+        const input = document.getElementById('passkey').value;
+        const error = document.getElementById('loginError');
+
+        if (input === ADMIN_PASSKEY) {
+            localStorage.setItem('adminLoggedIn', 'true');
+            showAdmin();
+        } else {
+            error.style.display = 'block';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('adminLoggedIn');
+        location.reload();
+    }
+
+    function showAdmin() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadOrders();
+    }
+
+    /* ===== LOAD ORDERS ===== */
+    function loadOrders() {
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = '';
+
+        const orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        if (orders.length === 0) {
+            orderList.innerHTML = `<p class="empty">No orders yet 📭</p>`;
+            return;
+        }
+
+        orders.reverse().forEach(order => {
+            const div = document.createElement('div');
+            div.className = 'order-card';
+
+            div.innerHTML = `
+                <h3>Order • ${new Date(order.timestamp).toLocaleString()}</h3>
+                <p><strong>Name:</strong> ${order.customer.name}</p>
+                <p><strong>Phone:</strong> ${order.customer.phone}</p>
+                <p><strong>Address:</strong> ${order.customer.address}</p>
+                <p><strong>Payment:</strong> ${order.customer.payment}</p>
+                <p><strong>Total:</strong> ${order.total} TK</p>
+
+                <div class="order-items">
+                    <strong>Items:</strong>
+                    <ul>
+                        ${order.items.map(i => `<li>${i.name} × ${i.quantity}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            orderList.appendChild(div);
+        });
+    }
+
+    /* ===== AUTO LOGIN ===== */
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+        showAdmin();
+    }
+</script>
+
+</body>
+</html>

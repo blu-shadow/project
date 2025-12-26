@@ -1,0 +1,255 @@
+/* =======================
+   General Setup
+======================= */
+:root {
+    --primary-color: #E8491D;
+    --secondary-color: #333;
+    --background-color: #f6f6f6;
+    --card-background: #ffffff;
+    --shadow-light: 0 6px 18px rgba(0, 0, 0, 0.1);
+    --border-radius: 14px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--secondary-color);
+}
+
+/* =======================
+   Layout
+======================= */
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* =======================
+   Header
+======================= */
+header {
+    background: var(--card-background);
+    padding: 1rem 0;
+    box-shadow: var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+/* =======================
+   Buttons
+======================= */
+.cart-icon {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.9rem;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#cart-count {
+    background: white;
+    color: var(--primary-color);
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* =======================
+   Product Grid
+======================= */
+main h2 {
+    text-align: center;
+    margin: 1.8rem 0;
+    font-weight: 600;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 16px;
+    padding-bottom: 40px;
+}
+
+/* =======================
+   Product Card (NEW STYLE)
+======================= */
+.product-card {
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    transition: transform 0.25s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Image Wrapper */
+.product-card img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Info Section */
+.product-info {
+    padding: 12px;
+    text-align: left;
+}
+
+.product-info h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #111;
+}
+
+.product-info p {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* Add to cart button */
+.product-info button {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+
+/* =======================
+   Modal Styling
+======================= */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1001;
+}
+
+.modal-content {
+    background: white;
+    margin: 8% auto;
+    padding: 25px;
+    width: 92%;
+    max-width: 480px;
+    border-radius: 14px;
+}
+
+.modal-content h3 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.close-button {
+    float: right;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+/* =======================
+   Cart
+======================= */
+#cart-items-list {
+    max-height: 260px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ddd;
+}
+
+.cart-item-total {
+    font-weight: 600;
+}
+
+.qty-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+/* =======================
+   Checkout
+======================= */
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.payment-info {
+    background: #fff3cd;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* =======================
+   Success Modal
+======================= */
+.success-content {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.success-content h3 {
+    color: #28a745;
+}
+
+/* =======================
+   Responsive
+======================= */
+@media (min-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .product-card img {
+        height: 280px;
+    }
+}
