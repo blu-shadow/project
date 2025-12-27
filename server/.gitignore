@@ -1,0 +1,8 @@
+# server/.gitignore
+
+# Ignore the environment file (crucial for security)
+.env
+# Ignore node dependencies
+node_modules
+# Ignore logs and temp files
+*.log
