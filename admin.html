@@ -5,10 +5,10 @@
     <title>DadaXWear Admin Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* [পূর্বের CSS অংশ অপরিবর্তিত থাকবে] */
         * {
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
@@ -42,7 +42,8 @@
             margin-bottom: 20px;
             color: #E8491D;
         }
-
+        
+        /* Username/Password Input */
         .login-box input {
             width: 100%;
             padding: 12px;
@@ -62,6 +63,7 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            transition: background 0.3s;
         }
 
         .login-box button:hover {
@@ -72,6 +74,7 @@
             color: red;
             font-size: 0.9rem;
             display: none;
+            margin-bottom: 10px;
         }
 
         /* ===== Admin Panel ===== */
@@ -113,11 +116,13 @@
             border-radius: 8px;
             margin-bottom: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #E8491D; /* হাইলাইট করতে */
         }
 
         .order-card h3 {
             margin: 0 0 10px;
             color: #E8491D;
+            font-size: 1.2rem;
         }
 
         .order-card p {
@@ -129,7 +134,17 @@
             margin-top: 10px;
             font-size: 0.9rem;
             padding-left: 15px;
+            border-top: 1px dashed #eee;
+            padding-top: 10px;
         }
+        
+        .order-card .status-pending { color: orange; font-weight: 600; }
+        .order-card .status-delivered { color: green; font-weight: 600; }
+        /* নতুন: অ্যাডমিন টুলস */
+        .admin-tools { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee; }
+        .admin-tools select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        .admin-tools button { background: #5cb85c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+
 
         .empty {
             text-align: center;
@@ -140,17 +155,18 @@
 </head>
 <body>
 
-<!-- ===== LOGIN ===== -->
 <div class="login-container" id="loginScreen">
     <div class="login-box">
         <h2>🔐 Admin Login</h2>
-        <input type="password" id="passkey" placeholder="Enter Admin Pass Key">
-        <p class="error" id="loginError">❌ Wrong Pass Key</p>
-        <button onclick="login()">Login</button>
+        <input type="text" id="username" placeholder="Username (e.g., admin)">
+        <input type="password" id="password" placeholder="Password">
+        
+        <p class="error" id="loginError">❌ Invalid Username or Password</p>
+        <button onclick="handleLogin()">Login</button>
+        <p style="font-size: 0.8rem; color: #888; margin-top: 15px;">Default: admin / dadawear123</p>
     </div>
 </div>
 
-<!-- ===== ADMIN PANEL ===== -->
 <div class="admin-panel" id="adminPanel">
 
     <header>
@@ -158,67 +174,185 @@
         <button onclick="logout()">Logout</button>
     </header>
 
-    <div class="orders" id="orderList"></div>
+    <div class="orders" id="orderList">
+        <p class="empty" id="loadingMessage">Loading orders...</p>
+    </div>
 
 </div>
 
 <script>
-    /* ===== CONFIG ===== */
-    const ADMIN_PASSKEY = "dadawear123"; // 🔑 change later
+    // ===========================================
+    // ADMIN PANEL JAVASCRIPT (API INTEGRATED)
+    // ===========================================
+    
+    // 🔌 API Configuration
+    const API_BASE_URL = 'http://localhost:5000/api'; 
 
-    /* ===== LOGIN ===== */
-    function login() {
-        const input = document.getElementById('passkey').value;
-        const error = document.getElementById('loginError');
+    // --- DOM Elements ---
+    const loginScreen = document.getElementById('loginScreen');
+    const adminPanel = document.getElementById('adminPanel');
+    const loginError = document.getElementById('loginError');
+    const orderList = document.getElementById('orderList');
+    const loadingMessage = document.getElementById('loadingMessage');
 
-        if (input === ADMIN_PASSKEY) {
-            localStorage.setItem('adminLoggedIn', 'true');
+
+    // ===============================
+    // 1. AUTHENTICATION (Login, Logout, Token Management)
+    // ===============================
+
+    function getToken() {
+        return localStorage.getItem('adminToken');
+    }
+
+    // API এর মাধ্যমে লগইন হ্যান্ডেল করা
+    async function handleLogin() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        loginError.style.display = 'none';
+
+        if (!username || !password) {
+            loginError.textContent = 'Username and Password are required.';
+            loginError.style.display = 'block';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!response.ok) {
+                // সার্ভার থেকে আসা JSON ত্রুটি বার্তা দেখান
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login failed');
+            }
+
+            const data = await response.json();
+            
+            // 📝 টোকেন সংরক্ষণ করা
+            localStorage.setItem('adminToken', data.token); 
+            
             showAdmin();
-        } else {
-            error.style.display = 'block';
+
+        } catch (error) {
+            console.error('Login Error:', error);
+            loginError.textContent = error.message;
+            loginError.style.display = 'block';
         }
     }
 
     function logout() {
-        localStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('adminToken'); // টোকেন সরিয়ে দিন
         location.reload();
     }
 
     function showAdmin() {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        loadOrders();
+        loginScreen.style.display = 'none';
+        adminPanel.style.display = 'block';
+        loadOrders(); // লগইন সফল হলে অর্ডার লোড করুন
     }
 
-    /* ===== LOAD ORDERS ===== */
-    function loadOrders() {
-        const orderList = document.getElementById('orderList');
+
+    // ===============================
+    // 2. ORDER LOADING AND RENDERING
+    // ===============================
+
+    async function loadOrders() {
+        const token = getToken();
+        orderList.innerHTML = ''; // তালিকা পরিষ্কার করুন
+        loadingMessage.style.display = 'block';
+
+        if (!token) {
+            logout(); // টোকেন না থাকলে লগইন স্ক্রিনে পাঠান
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/orders/all`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}` // 🔑 টোকেন সহ রিকোয়েস্ট
+                }
+            });
+
+            if (response.status === 401) {
+                // টোকেন অবৈধ বা মেয়াদ উত্তীর্ণ হলে
+                throw new Error('Session expired. Please log in again.');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch orders from server.');
+            }
+
+            const orders = await response.json();
+            renderOrders(orders);
+
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            orderList.innerHTML = `<p class="empty" style="color: red;">${error.message}</p>`;
+            // সেশন এক্সপায়ার হলে স্বয়ংক্রিয় লগআউট
+            if (error.message.includes('Session expired')) {
+                setTimeout(logout, 2000); 
+            }
+        } finally {
+            loadingMessage.style.display = 'none';
+        }
+    }
+
+    // 3. রেন্ডারিং ফাংশন
+    function renderOrders(orders) {
         orderList.innerHTML = '';
-
-        const orders = JSON.parse(localStorage.getItem('orders')) || [];
-
         if (orders.length === 0) {
             orderList.innerHTML = `<p class="empty">No orders yet 📭</p>`;
             return;
         }
 
-        orders.reverse().forEach(order => {
+        orders.forEach(order => {
             const div = document.createElement('div');
             div.className = 'order-card';
+            
+            // ডেটাবেস থেকে আসা ডেটা ব্যবহার করা
+            const customer = order.shippingAddress;
+            const statusClass = order.status === 'Pending' ? 'status-pending' : order.status === 'Delivered' ? 'status-delivered' : '';
 
             div.innerHTML = `
-                <h3>Order • ${new Date(order.timestamp).toLocaleString()}</h3>
-                <p><strong>Name:</strong> ${order.customer.name}</p>
-                <p><strong>Phone:</strong> ${order.customer.phone}</p>
-                <p><strong>Address:</strong> ${order.customer.address}</p>
-                <p><strong>Payment:</strong> ${order.customer.payment}</p>
-                <p><strong>Total:</strong> ${order.total} TK</p>
+                <h3>Order ID: ${order._id.substring(18)} (${order.status})</h3>
+                <p><strong>Status:</strong> <span class="${statusClass}">${order.status}</span></p>
+                <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+                
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #eee;">
+                
+                <p><strong>Name:</strong> ${customer.fullName}</p>
+                <p><strong>Phone:</strong> ${customer.phoneNumber}</p>
+                <p><strong>Address:</strong> ${customer.fullAddress}</p>
+                <p><strong>Payment:</strong> ${order.paymentMethod} ${order.transactionId ? ` (TrxID: ${order.transactionId})` : ''}</p>
+                
+                <hr style="margin: 10px 0; border: none; border-top: 1px solid #eee;">
+
+                <p><strong>Subtotal:</strong> ${order.itemsPrice} TK</p>
+                <p><strong>Shipping:</strong> ${order.shippingPrice} TK</p>
+                <p><strong>Total:</strong> <strong>${order.totalPrice} TK</strong></p>
 
                 <div class="order-items">
                     <strong>Items:</strong>
                     <ul>
-                        ${order.items.map(i => `<li>${i.name} × ${i.quantity}</li>`).join('')}
+                        ${order.orderItems.map(i => `<li>${i.name} (${i.size}) × ${i.quantity}</li>`).join('')}
                     </ul>
+                </div>
+                
+                <div class="admin-tools">
+                    <select id="status-select-${order._id}">
+                        <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                        <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                        <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                        <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                    <button onclick="updateOrderStatus('${order._id}')">Update Status</button>
                 </div>
             `;
 
@@ -226,10 +360,55 @@
         });
     }
 
-    /* ===== AUTO LOGIN ===== */
-    if (localStorage.getItem('adminLoggedIn') === 'true') {
-        showAdmin();
+    // ===============================
+    // 3. ORDER STATUS UPDATE (New Function)
+    // ===============================
+    async function updateOrderStatus(orderId) {
+        const token = getToken();
+        const selectElement = document.getElementById(`status-select-${orderId}`);
+        const newStatus = selectElement.value;
+
+        if (!confirm(`Are you sure you want to change status of Order ${orderId.substring(18)} to ${newStatus}?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.status === 401) {
+                 throw new Error('Not authorized. Token invalid.');
+            }
+            if (!response.ok) {
+                 throw new Error('Status update failed on server.');
+            }
+
+            // সফল হলে
+            alert(`Order ${orderId.substring(18)} status updated to ${newStatus}.`);
+            loadOrders(); // অর্ডার তালিকা রিফ্রেশ করুন
+
+        } catch (error) {
+            console.error('Status Update Error:', error);
+            alert(`Failed to update status: ${error.message}`);
+        }
     }
+
+
+    // ===============================
+    // 4. INITIAL CHECK
+    // ===============================
+    document.addEventListener('DOMContentLoaded', () => {
+        // টোকেন থাকলে সরাসরি অ্যাডমিন প্যানেল দেখান
+        if (getToken()) {
+            showAdmin();
+        }
+    });
 </script>
 
 </body>
