@@ -17,9 +17,14 @@
     font-family: 'Poppins', sans-serif;
 }
 
+html {
+    font-size: 16px;
+}
+
 body {
     background-color: var(--background-color);
     color: var(--secondary-color);
+    line-height: 1.6;
 }
 
 /* =======================
@@ -36,7 +41,7 @@ body {
 ======================= */
 header {
     background: var(--card-background);
-    padding: 1rem 0;
+    padding: 0.9rem 0;
     box-shadow: var(--shadow-light);
     position: sticky;
     top: 0;
@@ -51,31 +56,32 @@ header .container {
 
 .logo {
     color: var(--primary-color);
-    font-size: 1.8rem;
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
     font-weight: 700;
 }
 
 /* =======================
-   Buttons
+   Cart Button
 ======================= */
 .cart-icon {
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 0.5rem 0.9rem;
+    padding: 0.45rem 0.8rem;
     border-radius: 50px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
+    font-size: 0.9rem;
 }
 
 #cart-count {
     background: white;
     color: var(--primary-color);
     border-radius: 50%;
-    padding: 2px 7px;
-    font-size: 0.75rem;
+    padding: 2px 6px;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
@@ -84,61 +90,59 @@ header .container {
 ======================= */
 main h2 {
     text-align: center;
-    margin: 1.8rem 0;
+    margin: 1.6rem 0;
     font-weight: 600;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
 }
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
     padding-bottom: 40px;
 }
 
 /* =======================
-   Product Card (NEW STYLE)
+   Product Card
 ======================= */
 .product-card {
     background: var(--card-background);
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--shadow-light);
-    transition: transform 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .product-card:hover {
     transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Image Wrapper */
 .product-card img {
     width: 100%;
-    height: 230px;
+    height: clamp(180px, 40vw, 300px);
     object-fit: cover;
     display: block;
 }
 
-/* Info Section */
 .product-info {
     padding: 12px;
-    text-align: left;
 }
 
 .product-info h3 {
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: #111;
 }
 
 .product-info p {
-    font-size: 1.05rem;
+    font-size: clamp(0.95rem, 3vw, 1.1rem);
     font-weight: 700;
     color: var(--primary-color);
     margin-bottom: 10px;
 }
 
-/* Add to cart button */
 .product-info button {
     width: 100%;
     padding: 8px;
@@ -159,9 +163,9 @@ main h2 {
 
 .modal-content {
     background: white;
-    margin: 8% auto;
-    padding: 25px;
-    width: 92%;
+    margin: 10vh auto;
+    padding: 20px;
+    width: 95%;
     max-width: 480px;
     border-radius: 14px;
 }
@@ -174,7 +178,7 @@ main h2 {
 
 .close-button {
     float: right;
-    font-size: 26px;
+    font-size: 24px;
     cursor: pointer;
 }
 
@@ -190,8 +194,11 @@ main h2 {
 .cart-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 6px;
     padding: 8px 0;
     border-bottom: 1px dashed #ddd;
+    font-size: 0.9rem;
 }
 
 .cart-item-total {
@@ -213,6 +220,10 @@ main h2 {
     margin-bottom: 12px;
 }
 
+.form-group label {
+    font-size: 0.85rem;
+}
+
 .form-group input,
 .form-group textarea,
 .form-group select {
@@ -220,6 +231,7 @@ main h2 {
     padding: 9px;
     border-radius: 8px;
     border: 1px solid #ccc;
+    font-size: 0.9rem;
 }
 
 .payment-info {
@@ -227,6 +239,7 @@ main h2 {
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 15px;
+    font-size: 0.85rem;
 }
 
 /* =======================
@@ -239,17 +252,34 @@ main h2 {
 
 .success-content h3 {
     color: #28a745;
+    font-size: 1.4rem;
 }
 
 /* =======================
-   Responsive
+   Responsive Breakpoints
 ======================= */
+
+/* Tablets */
 @media (min-width: 768px) {
     .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
     }
 
-    .product-card img {
-        height: 280px;
+    .modal-content {
+        padding: 25px;
+    }
+}
+
+/* Laptops */
+@media (min-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+}
+
+/* Large Screens */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
     }
 }
